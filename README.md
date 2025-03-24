@@ -50,8 +50,8 @@ SAFER-Splat (Simultaneous Action Filtering and Environment Reconstruction) is a 
 We propose a novel Control Barrier Function (CBF) that not only induces safety with respect to all Gaussian primitives in the scene, but when synthesized into a controller, is capable of processing hundreds of thousands of Gaussians while maintaining a minimal memory footprint and operating at 15 Hz during online Splat training. Of the total compute time, a small fraction of it consumes GPU resources, enabling uninterrupted training. The safety layer is minimally invasive, correcting robot actions only when they are unsafe. To showcase the safety filter, we also introduce SplatBridge, an open-source software package built with ROS for real-time GSplat mapping for robots. We demonstrate the safety and robustness of our pipeline first in simulation, where our method is 20-50x faster, safer, and less conservative than competing methods based on neural radiance fields. Further, we demonstrate simultaneous GSplat mapping and safety filtering on a drone hardware platform using only on-board perception. We verify that under teleoperation a human pilot cannot invoke a collision.
 
 ## TODOs
-1. Upload SplatBridge and ROS nodes.
-2. Upload visualizer of trajectories in Nerfstudio viewer.
+1. ~~Upload SplatBridge and ROS nodes.~~
+2. ~~Upload visualizer of trajectories in Nerfstudio viewer.~~
 3. Provide interactive Colab notebook that allows users to interface with the safety layer on a trained Splat.
 
 ## Dependencies
@@ -86,13 +86,13 @@ After the dependencies and the data is setup, run
 python run.py
 ```
 
-The most important thing is to ensure that the path in NeRFWrapper is pointing to the right model location.
+The most important thing is to ensure that the path in GSplatLoader is pointing to the right model location.
 
 ### Variants
-The variants for the distance can be changed.
+The variants for the distance can be changed. ```run.py``` allows you to change the distance type within the script.
 
 ### Visualizing the paths
-Under construction...
+Run the ```visualize.py```, setting your scene name and method type properly so that the script correctly extracts the Gaussian Splatting model and the saved trajectory data (that was created through ```run.py```). This script will launch viser and load your trajectories into the visualizer. If you run into issues where viser informs you that ```add_gaussian_splats``` does not exist, this means you have an outdated version of viser (likely one that came packaged with Nerfstudio) and will need to upgrade [viser](https://github.com/nerfstudio-project/viser). Afterwards, navigate to the specified port in the browser to visualize the trajectories and the ellipsoidal representation of the Gaussian Splat. 
 
 ## Generating your own scenes
 To use your own datasets, simply train a Nerfstudio `splatfacto` model and follow the folder structure as illustrated above. If your images contain pixels that are transparent like in the case of synthetic scenes (i.e. the alpha value is 0), it is recommended to use the `instant-ngp-data` flag (e.g. `ns-train splatfacto --data {DATA} instant-ngp-data`) rather than `blender-data` or the default.
