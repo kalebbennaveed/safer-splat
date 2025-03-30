@@ -38,6 +38,8 @@ class GSplatLoader():
 
         self.colors = SH2RGB(self.splat.pipeline.model.features_dc.detach().clone())
 
+        self.opacities = torch.sigmoid(self.splat.pipeline.model.opacities.detach().clone())
+        
         print(f'There are {self.means.shape[0]} Gaussians in the GSplat model')
 
         return
