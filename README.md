@@ -74,7 +74,7 @@ cd safer-splat
 
 pip install torch==2.1.2+cu118 torchvision==0.16.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
 conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit
-pip install nerfstudio
+pip install nerfstudio=1.1.5
 pip install -r requirements.txt
 ```
 
