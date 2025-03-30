@@ -72,6 +72,7 @@ pip install --upgrade pip
 git clone https://github.com/chengine/safer-splat.git
 cd safer-splat
 
+pip install torch==2.1.2+cu118 torchvision==0.16.2+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
 conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit
 pip install -r requirements.txt
 ```
