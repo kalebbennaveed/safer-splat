@@ -62,10 +62,10 @@ This repository is built off of [Nerfstudio](https://github.com/nerfstudio-proje
 * [CLARABEL](https://github.com/oxfordcontrol/Clarabel.rs). This library is for solving the quadratic program.
 
 ### Dependencies (Simplified)
-Our codebase is tested with Python 3.9, Nerfstudio 1.1.5, viser 0.2.7, Clarabel 0.10.0, Numpy 1.26.4, PyTorch 2.1.2, and CUDA 11.8. You can get up and running the quickest following the following commands:
+Our codebase is tested with Python 3.10, Nerfstudio 1.1.5, viser 0.2.7, Clarabel 0.10.0, Numpy 1.26.4, PyTorch 2.1.2, and CUDA 11.8. You can get up and running the quickest following the following commands:
 
 ```
-conda create -n safersplat python=3.9
+conda create -n safersplat python=3.10
 conda activate safersplat
 pip install --upgrade pip
 
