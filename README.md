@@ -49,15 +49,32 @@ SAFER-Splat (Simultaneous Action Filtering and Environment Reconstruction) is a 
 ## About
 We propose a novel Control Barrier Function (CBF) that not only induces safety with respect to all Gaussian primitives in the scene, but when synthesized into a controller, is capable of processing hundreds of thousands of Gaussians while maintaining a minimal memory footprint and operating at 15 Hz during online Splat training. Of the total compute time, a small fraction of it consumes GPU resources, enabling uninterrupted training. The safety layer is minimally invasive, correcting robot actions only when they are unsafe. To showcase the safety filter, we also introduce SplatBridge, an open-source software package built with ROS for real-time GSplat mapping for robots. We demonstrate the safety and robustness of our pipeline first in simulation, where our method is 20-50x faster, safer, and less conservative than competing methods based on neural radiance fields. Further, we demonstrate simultaneous GSplat mapping and safety filtering on a drone hardware platform using only on-board perception. We verify that under teleoperation a human pilot cannot invoke a collision.
 
+## Features
+1. We provide ROS 2 nodes in `ros` branch. This includes SplatBridge and the CBF functions.
+2. You can now view the Gaussian Splat and the CBF trajectories in viser. See **Visualizing the paths** section.
+
 ## TODOs
-1. ~~Upload SplatBridge and ROS nodes.~~
-2. ~~Upload visualizer of trajectories in Nerfstudio viewer.~~
-3. Provide interactive Colab notebook that allows users to interface with the safety layer on a trained Splat.
+1. Provide interactive Colab notebook that allows users to interface with the safety layer on a trained Splat.
 
 ## Dependencies
 This repository is built off of [Nerfstudio](https://github.com/nerfstudio-project/nerfstudio/tree/main). Please first follow the installation instructions there before installing any of the dependencies specifically for this repository. Once you have Nerfstudio installed in your Conda environment, install the following dependencies in that environment.
 
 * [CLARABEL](https://github.com/oxfordcontrol/Clarabel.rs). This library is for solving the quadratic program.
+
+### Dependencies (Simplified)
+Our codebase is tested with Python 3.9, Nerfstudio 1.1.5, viser 0.2.7, Clarabel 0.10.0, Numpy 1.26.4, PyTorch 2.1.2, and CUDA 11.8. You can get up and running the quickest following the following commands:
+
+```
+conda create -n safersplat python=3.9
+conda activate safersplat
+pip install --upgrade pip
+
+git clone https://github.com/chengine/safer-splat.git
+cd safer-splat
+
+conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit
+pip install -r requirements.txt
+```
 
 ## Datasets
 Our datasets are hosted on a [Google Drive](https://drive.google.com/drive/folders/1xSu7bFW8OBRd9YHfz3LzdBx7pDjUHEPh?usp=sharing). The scenes used in the paper are `flightgate`, `statues`,  `stonehenge`, `adirondacks`. The training data is in the `data` folder, while the model parameters are in `outputs`. You can drag and drop these folders into your working directory.
