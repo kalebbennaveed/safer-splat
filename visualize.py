@@ -140,7 +140,7 @@ for i, data in enumerate(datas):
 
     # Add trajectory to scene
     server.scene.add_line_segments(
-        name=f"/traj_{i}",
+        name=f"/trajs/{i}",
         points=points,
         colors=colors,
         line_width=10,

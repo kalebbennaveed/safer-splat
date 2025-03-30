@@ -1,5 +1,6 @@
 import numpy as np
 import open3d as o3d
+import tqdm
 
 def create_gs_mesh(means, rotations, scalings, colors, res=4, transform=None, scale=None):
     scene = o3d.geometry.TriangleMesh()
@@ -17,14 +18,18 @@ def create_gs_mesh(means, rotations, scalings, colors, res=4, transform=None, sc
 
         rotations = np.matmul(rot, rotations)
 
-    for i, (mean, R, S, col) in enumerate(zip(means, rotations, scalings, colors)):
-        one_gs_mesh = o3d.geometry.TriangleMesh.create_sphere(resolution=res)
-        points = np.asarray(one_gs_mesh.vertices)
-        new_points = points * S[None]
-        one_gs_mesh.vertices = o3d.utility.Vector3dVector(new_points)
-        one_gs_mesh = one_gs_mesh.paint_uniform_color(col)
-        one_gs_mesh = one_gs_mesh.rotate(R)
-        one_gs_mesh = one_gs_mesh.translate(mean)
-        scene += one_gs_mesh
+    base_sphere = o3d.geometry.TriangleMesh.create_sphere(resolution=res)
+
+    colors = np.clip(colors, 0, 1)
+
+    for (mean, R, S, col) in tqdm.tqdm(zip(means, rotations, scalings, colors), desc="Generating mesh"):
+        primitive = o3d.geometry.TriangleMesh(base_sphere)
+        points = np.asarray(primitive.vertices)
+        points *= S[None]
+        primitive.vertices = o3d.utility.Vector3dVector(points)
+        primitive = primitive.paint_uniform_color(col)
+        primitive = primitive.rotate(R)
+        primitive = primitive.translate(mean)
+        scene += primitive
 
     return scene
