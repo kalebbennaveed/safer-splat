@@ -7,7 +7,7 @@ import time
 from ellipsoids.mesh_utils import create_gs_mesh
 from ellipsoids.covariance_utils import quaternion_to_rotation_matrix
 from ellipsoids.covariance_utils import compute_cov
-from splat.distances import distance_point_ellipsoid, batch_point_distance, batch_squared_point_distance, batch_mahalanobis_distance
+from splat.distances import distance_point_ellipsoid, distance_point_ellipsoid_single, batch_point_distance, batch_squared_point_distance, batch_mahalanobis_distance
 from ns_utils.nerfstudio_utils import GaussianSplat, SH2RGB
 
 class GSplatLoader():
@@ -144,7 +144,7 @@ class GSplatLoader():
 
             info = None
 
-        elif (distance_type is None) or (distance_type == 'ball-to-ellipsoid'):
+        elif distance_type == 'ball-to-ellipsoid':
             # Queries the min Euclidian distance from point to ellipsoid
             # Rotate point into the ellipsoid frame
 
@@ -184,8 +184,49 @@ class GSplatLoader():
 
             info = {'y': y, 'phi': phi}
 
+        elif (distance_type is None) or (distance_type == 'ball-to-ellipsoid-single-integrator'):
+            # Queries the min Euclidian distance from point to ellipsoid
+            # Rotate point into the ellipsoid frame
+
+            # Convert rotations from quaternions to rotation matrices
+            rots = quaternion_to_rotation_matrix(self.rots)
+
+            # Sort the scales in descending order as required by the solver
+            sorted_output = torch.sort(self.scales, dim=-1, descending=True)
+            sorted_scales, sorted_inds = sorted_output[0], sorted_output[1]
+      
+            # NOTE:!!! IMPORTANT!!! When we sort, we need to change the rotation matrices accordingly
+            rots = torch.gather(rots, 2, sorted_inds[..., None, :].expand_as(rots))
+
+            # Translate robot w.r.t ellipsoid mean, then rotate point into ellipsoid aligned frame
+            x_local_frame = torch.bmm( torch.transpose(rots, 1, 2) , (x[..., :3] - self.means).unsqueeze(-1) ).squeeze() + 1e-8
+
+            # The solver requires the point to be in the first octant. Calculate the sign of the point and flip the point.
+            flip = torch.sign(x_local_frame)
+            x_local_frame = torch.abs(x_local_frame)
+
+            # solve for the distance in the local frame
+            dist, _, yhat = distance_point_ellipsoid_single(sorted_scales + 1e-8, x_local_frame)
+
+            # flip, rotate, and translate the closest point back to the global frame
+            y = torch.bmm(rots, (flip * yhat).unsqueeze(-1)).squeeze(-1) + self.means
+
+            # Calculate cbf 
+            phi = torch.sign( torch.sum( (1./ sorted_scales)**2 * (x_local_frame**2) , dim=-1) - 1.)
+
+            h = phi * dist - (radius + epsilon)**2
+
+            # Compute gradient in world frame. 
+            grad_h = 2 * phi[..., None] * (x[..., :3] - y)
+
+
+            info = {'y': y, 'phi': phi}
+
+            hess_h = None
+
         else:
             raise ValueError('Distance type not recognized. Please provide a valid distance type.')
+
 
         return h, grad_h, hess_h, info
     

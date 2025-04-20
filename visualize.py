@@ -36,7 +36,7 @@ def as_mesh(scene_or_mesh):
 ### PARAMETERS###
 # NOTE: THIS REQUIRES CHANGING TO THE SCENE YOU WANT TO VISUALIZE
 scene_name = 'stonehenge'      # statues, stonehenge, old_union, flight. If custom scene, specify path to gsplat config file and trajectory data            
-method = 'ball-to-ellipsoid'   # ball-to-ellipsoid, ball-to-ball-squared, ball-to-pt-squared, mahalanobis, ball-to-ball
+method = 'ball-to-ellipsoid-single-integrator'   # ball-to-ellipsoid, ball-to-ball-squared, ball-to-pt-squared, mahalanobis, ball-to-ball
 
 try:
     if scene_name == 'statues':
@@ -82,7 +82,7 @@ opacities = gsplat.opacities[mask]
 # Add splat to the scene
 # NOTE!!! You may have to upgrade viser to the latest version to use this function. If you have the base viser version that comes intsalled
 # with nerfstudio, you will likely have to upgrade it. Upgrading viser will not break nerfstudio.
-server.scene.add_gaussian_splats(
+server.scene._add_gaussian_splats(
     name="/splats",
     centers= means.cpu().numpy(),
     covariances= covs.cpu().numpy(),

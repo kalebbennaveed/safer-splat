@@ -124,3 +124,30 @@ def distance_point_ellipsoid(s, x):
     hess = 2 * ( torch.diag_embed( 1. - (y / x))  + (1. / dq_dlam[..., None]) * torch.einsum('bi, bj -> bij', dy_dlam, dq_dx)   )
 
     return squared_distance, grad, hess, y
+
+
+# Calculates the min. distance from a point to an ellipsoid
+def distance_point_ellipsoid_single(s, x):
+    # NOTE: e0, e1, e2: semi-axes of the ellipsoid (e0 > e1 > e2)
+    # Change of variables
+    z = x / s
+    g = torch.sum(z**2, dim=-1) - 1.
+    r = (s[..., :] / s[..., -1][..., None])**2
+
+    # Calculate dual variable
+    lam = real_get_root(r, z, g)
+    
+    # Calculate optimal closest point
+    y = r * x / (lam + r)
+    
+    # This is the unscaled labmda
+    lam = ( lam.squeeze() * (s[..., -1])**2 ).unsqueeze(-1)
+
+    # Calculate distance
+    squared_distance = torch.sum( (y - x)**2, dim=-1)
+
+    # Gradient in local frame
+    grad = 2*(x - y)
+
+
+    return squared_distance, grad, y
